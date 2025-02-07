@@ -206,6 +206,14 @@ static __printf(1, 2) void binder_user_error(const char *format, ...)
 #define to_binder_fd_array_object(hdr) \
 	container_of(hdr, struct binder_fd_array_object, hdr)
 
+static struct kmem_cache *binder_node_pool;
+static struct kmem_cache *binder_proc_pool;
+static struct kmem_cache *binder_ref_death_pool;
+static struct kmem_cache *binder_ref_pool;
+static struct kmem_cache *binder_thread_pool;
+static struct kmem_cache *binder_transaction_pool;
+static struct kmem_cache *binder_work_pool;
+
 #ifdef CONFIG_ANDROID_BINDER_LOGS
 static struct binder_stats binder_stats;
 
@@ -221,14 +229,6 @@ static inline void binder_stats_created(enum binder_stat_types type)
 
 struct binder_transaction_log binder_transaction_log;
 struct binder_transaction_log binder_transaction_log_failed;
-
-static struct kmem_cache *binder_node_pool;
-static struct kmem_cache *binder_proc_pool;
-static struct kmem_cache *binder_ref_death_pool;
-static struct kmem_cache *binder_ref_pool;
-static struct kmem_cache *binder_thread_pool;
-static struct kmem_cache *binder_transaction_pool;
-static struct kmem_cache *binder_work_pool;
 
 static struct binder_transaction_log_entry *binder_transaction_log_add(
 	struct binder_transaction_log *log)
@@ -3318,6 +3318,7 @@ static void binder_transaction(struct binder_proc *proc,
 			oem_binder_hook_set.oem_trans_hook(target_proc->tsk, proc->tsk,
 					thread->pid, tr->flags & TF_ONE_WAY,
 					tr->code);
+#endif
 		if (security_binder_transaction(binder_get_cred(proc),
 						binder_get_cred(target_proc)) < 0) {
 			return_error = BR_FAILED_REPLY;
