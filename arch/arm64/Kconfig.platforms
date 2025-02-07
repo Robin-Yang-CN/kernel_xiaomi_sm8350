@@ -448,6 +448,12 @@ config MACH_XIAOMI_VENUS
 	help
 	  This enables support for Xiaomi MI 11.
 
+config MACH_XIAOMI_VILI
+	bool "Vili platform"
+	select MACH_XIAOMI_SM8350
+	help
+	  This enables support for Xiaomi 11T Pro.
+
 config MACH_XIAOMI_SM7350
 	bool "Xiaomi SM7350 platform devices"
 	select ARCH_QCOM
