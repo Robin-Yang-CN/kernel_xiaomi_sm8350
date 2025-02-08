@@ -207,7 +207,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.type = V4L2_CTRL_TYPE_INTEGER,
 		.minimum = SINGLE_OUTPUT_BUFFER,
 		.maximum = MAX_NUM_OUTPUT_BUFFERS,
-		.default_value = SINGLE_OUTPUT_BUFFER,
+		.default_value = MAX_NUM_OUTPUT_BUFFERS,
 		.step = 1,
 		.qmenu = NULL,
 	},
@@ -217,7 +217,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.type = V4L2_CTRL_TYPE_INTEGER,
 		.minimum = SINGLE_INPUT_BUFFER,
 		.maximum = MAX_NUM_INPUT_BUFFERS,
-		.default_value = SINGLE_INPUT_BUFFER,
+		.default_value = MAX_NUM_INPUT_BUFFERS,
 		.step = 1,
 		.qmenu = NULL,
 	},
@@ -238,7 +238,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.type = V4L2_CTRL_TYPE_MENU,
 		.minimum = V4L2_MPEG_VIDEO_BITRATE_MODE_VBR,
 		.maximum = V4L2_MPEG_VIDEO_BITRATE_MODE_CQ,
-		.default_value = V4L2_MPEG_VIDEO_BITRATE_MODE_VBR,
+		.default_value = V4L2_MPEG_VIDEO_BITRATE_MODE_CQ,
 		.menu_skip_mask = ~(
 		(1 << V4L2_MPEG_VIDEO_BITRATE_MODE_VBR) |
 		(1 << V4L2_MPEG_VIDEO_BITRATE_MODE_CBR) |
@@ -255,7 +255,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.type = V4L2_CTRL_TYPE_INTEGER,
 		.minimum = MIN_FRAME_QUALITY,
 		.maximum = MAX_FRAME_QUALITY,
-		.default_value = DEFAULT_FRAME_QUALITY,
+		.default_value = MAX_FRAME_QUALITY,
 		.step = FRAME_QUALITY_STEP,
 		.qmenu = NULL,
 	},
@@ -285,7 +285,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.type = V4L2_CTRL_TYPE_INTEGER,
 		.minimum = MIN_BIT_RATE,
 		.maximum = MAX_BIT_RATE,
-		.default_value = DEFAULT_BIT_RATE,
+		.default_value = MAX_BIT_RATE,
 		.step = BIT_RATE_STEP,
 		.qmenu = NULL,
 	},
@@ -307,7 +307,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.type = V4L2_CTRL_TYPE_MENU,
 		.minimum = V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE,
 		.maximum = V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_HIGH,
-		.default_value = V4L2_MPEG_VIDEO_H264_PROFILE_HIGH,
+		.default_value = V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_HIGH,
 		.menu_skip_mask = ~(
 		(1 << V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE) |
 		(1 << V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE) |
@@ -582,7 +582,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.type = V4L2_CTRL_TYPE_INTEGER,
 		.minimum = 0,
 		.maximum = MAX_HIER_CODING_LAYER,
-		.default_value = 0,
+		.default_value = MAX_HIER_CODING_LAYER,
 		.step = 1,
 		.qmenu = NULL,
 	},
@@ -593,7 +593,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.minimum = V4L2_MPEG_VIDC_VIDEO_HEVC_MAX_HIER_CODING_LAYER_0,
 		.maximum = V4L2_MPEG_VIDC_VIDEO_HEVC_MAX_HIER_CODING_LAYER_6,
 		.default_value =
-			V4L2_MPEG_VIDC_VIDEO_HEVC_MAX_HIER_CODING_LAYER_0,
+			V4L2_MPEG_VIDC_VIDEO_HEVC_MAX_HIER_CODING_LAYER_6,
 		.step = 1,
 		.menu_skip_mask = 0,
 	},
@@ -1587,7 +1587,7 @@ static int msm_venc_update_bitrate(struct msm_vidc_inst *inst)
 
 int msm_venc_s_ctrl(struct msm_vidc_inst *inst, struct v4l2_ctrl *ctrl)
 {
-	int rc = 0, hevc_tier_value = 0;
+	int rc = 0;
 	struct msm_vidc_mastering_display_colour_sei_payload *mdisp_sei = NULL;
 	struct msm_vidc_content_light_level_sei_payload *cll_sei = NULL;
 	u32 i_qp_min, i_qp_max, p_qp_min, p_qp_max, b_qp_min, b_qp_max;
@@ -1816,13 +1816,7 @@ int msm_venc_s_ctrl(struct msm_vidc_inst *inst, struct v4l2_ctrl *ctrl)
 		break;
 	case V4L2_CID_MPEG_VIDEO_H264_LEVEL:
 	case V4L2_CID_MPEG_VIDEO_HEVC_LEVEL:
-		if ((inst->level & 0xf0000000) && get_v4l2_codec(inst) == V4L2_PIX_FMT_HEVC) {
-			hevc_tier_value = (inst->level & 0xf0000000);
-			inst->level = msm_comm_v4l2_to_hfi(ctrl->id, ctrl->val, sid) | hevc_tier_value;
-		}
-		else {
-			inst->level = msm_comm_v4l2_to_hfi(ctrl->id, ctrl->val, sid);
-		}
+		inst->level = msm_comm_v4l2_to_hfi(ctrl->id, ctrl->val, sid);
 		break;
 	case V4L2_CID_MPEG_VIDEO_HEVC_TIER:
 		inst->level |=
